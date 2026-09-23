@@ -1,6 +1,6 @@
 package es.pdat.webappnotas.entity;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,14 +32,14 @@ public class Usuario {
     private boolean habilitado;
     
     @Column(name = "fecha_creacion", nullable = false)
-    private LocalDateTime fechaCreacion;
+    private Date fechaCreacion;
     
     public Usuario(){
         
     } 
 
     public Usuario(Long id, String nombreUsuario, String correo, String contrasena, String rol, boolean habilitado,
-            LocalDateTime fechaCreacion) {
+            Date fechaCreacion) {
         this.id = id;
         this.nombreUsuario = nombreUsuario;
         this.correo = correo;
@@ -98,11 +98,11 @@ public class Usuario {
         this.habilitado = habilitado;
     }
 
-    public LocalDateTime getFechaCreacion() {
+    public Date getFechaCreacion() {
         return fechaCreacion;
     }
 
-    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+    public void setFechaCreacion(Date fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
     }
     
