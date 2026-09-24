@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import es.pdat.webappnotas.dto.UsuarioCrearRequest;
 import es.pdat.webappnotas.dto.UsuarioResponse;
 import es.pdat.webappnotas.entity.Usuario;
+import es.pdat.webappnotas.exception.ConflictoException;
 import es.pdat.webappnotas.exception.RecursoNoEncontradoException;
 import es.pdat.webappnotas.repository.UsuarioRepository;
 
@@ -25,6 +26,14 @@ public class UsuarioService {
     }
 
     public UsuarioResponse insertUsuario(UsuarioCrearRequest usuarioRequest) {
+        if (usuarioRepository.existsByNombreUsuario(usuarioRequest.nombreUsuario())) {
+            throw new ConflictoException("El nombre de usuario " + usuarioRequest.nombreUsuario() + " ya está en uso");
+        }
+        if(usuarioRepository.existsByCorreo(usuarioRequest.correo())){
+            throw new ConflictoException("El correo " + usuarioRequest.correo() + " ya está en uso");
+        }
+
+
         Usuario usuario = new Usuario();
         usuario.setNombreUsuario(usuarioRequest.nombreUsuario());
         usuario.setCorreo(usuarioRequest.correo());
