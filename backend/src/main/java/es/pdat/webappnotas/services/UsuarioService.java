@@ -1,12 +1,14 @@
 package es.pdat.webappnotas.services;
 
 import java.util.Date;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import es.pdat.webappnotas.dto.UsuarioCrearRequest;
 import es.pdat.webappnotas.dto.UsuarioResponse;
 import es.pdat.webappnotas.entity.Usuario;
+import es.pdat.webappnotas.exception.RecursoNoEncontradoException;
 import es.pdat.webappnotas.repository.UsuarioRepository;
 
 @Service
@@ -22,8 +24,8 @@ public class UsuarioService {
         return usuarioRepository.count();
     }
 
-    public UsuarioResponse insertUsuario (UsuarioCrearRequest usuarioRequest){
-        Usuario usuario= new Usuario();
+    public UsuarioResponse insertUsuario(UsuarioCrearRequest usuarioRequest) {
+        Usuario usuario = new Usuario();
         usuario.setNombreUsuario(usuarioRequest.nombreUsuario());
         usuario.setCorreo(usuarioRequest.correo());
         usuario.setContrasena(usuarioRequest.contrasena());
@@ -31,7 +33,19 @@ public class UsuarioService {
         usuario.setRol("USER");
 
         usuario = usuarioRepository.save(usuario);
-        return new UsuarioResponse(usuario.getNombreUsuario(), usuario.getCorreo());
+        return new UsuarioResponse(usuario.getId(), usuario.getNombreUsuario(), usuario.getCorreo(), usuario.getRol(),
+                usuario.isHabilitado(), usuario.getFechaCreacion());
+    }
+
+    public UsuarioResponse findById(Long id) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
+        if (usuarioOpt.isEmpty()) {
+            throw new RecursoNoEncontradoException("Usuario con ID " + id + " no encontrado");
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        return new UsuarioResponse(usuario.getId(), usuario.getNombreUsuario(), usuario.getCorreo(), usuario.getRol(),
+                usuario.isHabilitado(), usuario.getFechaCreacion());
     }
 
 }

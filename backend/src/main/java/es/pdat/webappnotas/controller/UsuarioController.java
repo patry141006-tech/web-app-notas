@@ -1,5 +1,6 @@
 package es.pdat.webappnotas.controller;
 
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,6 +11,7 @@ import es.pdat.webappnotas.dto.UsuarioCrearRequest;
 import es.pdat.webappnotas.dto.UsuarioResponse;
 import es.pdat.webappnotas.services.UsuarioService;
 import jakarta.validation.Valid;
+import jakarta.websocket.server.PathParam;
 
 @RestController
 public class UsuarioController {
@@ -25,11 +27,18 @@ public class UsuarioController {
         return usuarioService.contar();
     }
 
-    @PostMapping
+    @PostMapping("/api/usuarios")
     public ResponseEntity<UsuarioResponse> crear(
             @Valid @RequestBody UsuarioCrearRequest request) {
         UsuarioResponse usu = usuarioService.insertUsuario(request);
         return ResponseEntity.ok(usu);
     }
+
+   @GetMapping ("/api/usuarios/{id}")
+   public ResponseEntity<UsuarioResponse> getUsuario(@PathParam("id") Long id){
+        UsuarioResponse usu= usuarioService.findById(id);
+        return ResponseEntity.ok(usu);
+
+   } 
 
 }
