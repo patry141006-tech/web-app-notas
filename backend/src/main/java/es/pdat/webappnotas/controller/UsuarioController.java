@@ -1,5 +1,6 @@
 package es.pdat.webappnotas.controller;
 
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +31,7 @@ public class UsuarioController {
     public ResponseEntity<UsuarioResponse> crear(
             @Valid @RequestBody UsuarioCrearRequest request) {
         UsuarioResponse usu = usuarioService.insertUsuario(request);
-        return ResponseEntity.ok(usu);
+        return ResponseEntity.status(201).body(usu);
     }
 
    @GetMapping ("/api/usuarios/{id}")

@@ -3,6 +3,7 @@ package es.pdat.webappnotas.services;
 import java.util.Date;
 import java.util.Optional;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import es.pdat.webappnotas.dto.UsuarioCrearRequest;
@@ -16,9 +17,11 @@ import es.pdat.webappnotas.repository.UsuarioRepository;
 public class UsuarioService {
 
     private UsuarioRepository usuarioRepository;
+    private PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public long contar() {
@@ -29,15 +32,16 @@ public class UsuarioService {
         if (usuarioRepository.existsByNombreUsuario(usuarioRequest.nombreUsuario())) {
             throw new ConflictoException("El nombre de usuario " + usuarioRequest.nombreUsuario() + " ya está en uso");
         }
-        if(usuarioRepository.existsByCorreo(usuarioRequest.correo())){
+        if (usuarioRepository.existsByCorreo(usuarioRequest.correo())) {
             throw new ConflictoException("El correo " + usuarioRequest.correo() + " ya está en uso");
         }
-
+        
+        String hash = passwordEncoder.encode(usuarioRequest.contrasena());
 
         Usuario usuario = new Usuario();
         usuario.setNombreUsuario(usuarioRequest.nombreUsuario());
         usuario.setCorreo(usuarioRequest.correo());
-        usuario.setContrasena(usuarioRequest.contrasena());
+        usuario.setContrasena(hash);
         usuario.setFechaCreacion(new Date());
         usuario.setRol("USER");
 
