@@ -35,7 +35,7 @@ public class UsuarioService {
         if (usuarioRepository.existsByCorreo(usuarioRequest.correo())) {
             throw new ConflictoException("El correo " + usuarioRequest.correo() + " ya está en uso");
         }
-        
+
         String hash = passwordEncoder.encode(usuarioRequest.contrasena());
 
         Usuario usuario = new Usuario();
@@ -59,6 +59,19 @@ public class UsuarioService {
         Usuario usuario = usuarioOpt.get();
         return new UsuarioResponse(usuario.getId(), usuario.getNombreUsuario(), usuario.getCorreo(), usuario.getRol(),
                 usuario.isHabilitado(), usuario.getFechaCreacion());
+    }
+
+    public boolean isLoginCorrect(String usuario, String password) {
+
+        Optional<Usuario> usuarioEncontrado = usuarioRepository.findByNombreUsuario(usuario);
+
+        if (usuarioEncontrado.isEmpty()) {
+            return false;
+        }
+
+        return passwordEncoder.matches(
+                password,
+                usuarioEncontrado.get().getContrasena());
     }
 
 }

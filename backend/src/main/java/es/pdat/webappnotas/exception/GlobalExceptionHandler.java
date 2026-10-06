@@ -45,11 +45,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> manejarValidacion(
             MethodArgumentNotValidException exception,
             HttpServletRequest request) {
+
+        String mensaje = exception.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .findFirst()
+                .orElse("Los datos enviados no son válidos");
+
         ErrorResponse error = new ErrorResponse(
                 new Date(),
                 HttpStatus.BAD_REQUEST.value(),
                 "VALIDATION_ERROR",
-                "Los datos enviados no son válidos",
+                mensaje,
                 request.getRequestURI());
         return ResponseEntity
                 .badRequest()
