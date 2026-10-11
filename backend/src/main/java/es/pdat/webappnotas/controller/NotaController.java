@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity.BodyBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +30,9 @@ public class NotaController {
 
     @GetMapping()
     public List<NotaResponse> getNotas() {
-        return notaService.getNotas();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        return notaService.getNotas(authentication.getName());
     }
 
     @GetMapping("/{id}")
@@ -38,7 +42,9 @@ public class NotaController {
 
     @PostMapping()
     public NotaResponse crear(@RequestBody NotaRequest request) {
-        return notaService.insertNota(request);
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        return notaService.insertNota(request, authentication.getName());
     }
 
     @PutMapping("/{id}")

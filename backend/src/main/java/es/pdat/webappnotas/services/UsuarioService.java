@@ -74,4 +74,8 @@ public class UsuarioService {
                 usuarioEncontrado.get().getContrasena());
     }
 
+    public Optional<Usuario> findByNombreUsuario (String usuario){
+        return usuarioRepository.findByNombreUsuario(usuario);
+    } 
+
 }
