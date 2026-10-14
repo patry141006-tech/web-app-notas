@@ -46,9 +46,16 @@ public class NotasService {
         return notasResponse;
     }
 
-    public NotaResponse getNota(long id) {
-        return new NotaResponse(notaRepository.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("La nota que buscas no existe")));
+    public NotaResponse getNota(long id, String usuario) {
+        Optional<Usuario> usuarioOpt = usuarioService.findByNombreUsuario(usuario);
+        if (usuarioOpt.isEmpty()) {
+            throw new RecursoNoEncontradoException("El usuario no existe");
+        }
+
+        Optional<Nota> nota = notaRepository.findByIdUsuarioAndId(usuarioOpt.get().getId(), id);
+
+        return new NotaResponse(
+                nota.orElseThrow(() -> new RecursoNoEncontradoException("La nota que buscas no existe")));
     }
 
     public NotaResponse insertNota(NotaRequest notaRequest, String usuario) {
@@ -56,14 +63,20 @@ public class NotasService {
         if (usuarioOpt.isEmpty()) {
             throw new RecursoNoEncontradoException("El usuario no existe");
         }
+
         Nota nota = new Nota(notaRequest);
         nota.setIdUsuario(usuarioOpt.get().getId());
         nota = notaRepository.save(nota);
         return new NotaResponse(nota);
     }
 
-    public NotaResponse updateNota(NotaRequest nota, long id) {
-        Nota notaGuardada = notaRepository.findById(id)
+    public NotaResponse updateNota(NotaRequest nota, long id, String usuario) {
+        Optional<Usuario> usuarioOpt = usuarioService.findByNombreUsuario(usuario);
+        if (usuarioOpt.isEmpty()) {
+            throw new RecursoNoEncontradoException("El usuario no existe");
+        }
+
+        Nota notaGuardada = notaRepository.findByIdUsuarioAndId(usuarioOpt.get().getId(), id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("La nota que buscas no existe"));
         notaGuardada.setTitulo(nota.titulo());
         notaGuardada.setContenido(nota.contenido());
@@ -74,8 +87,15 @@ public class NotasService {
         return new NotaResponse(notaGuardada);
     }
 
-    public void deleteNota(long id) {
-        notaRepository.deleteById(id);
-    }
+    public void deleteNota(long id, String usuario) {
+        Optional<Usuario> usuarioOpt = usuarioService.findByNombreUsuario(usuario);
+        if (usuarioOpt.isEmpty()) {
+            throw new RecursoNoEncontradoException("El usuario no existe");
+        }
 
+        Optional<Nota> nota = notaRepository.findByIdUsuarioAndId(usuarioOpt.get().getId(), id);
+        if (nota.isPresent()) {
+            notaRepository.deleteById(id);
+        }
+    }
 }
