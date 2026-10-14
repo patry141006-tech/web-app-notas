@@ -30,37 +30,27 @@ public class NotaController {
 
     @GetMapping()
     public List<NotaResponse> getNotas() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        return notaService.getNotas(authentication.getName());
+        return notaService.getNotas();
     }
 
     @GetMapping("/{id}")
     public NotaResponse getNota(@PathVariable("id") Long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        return notaService.getNota(id, authentication.getName());
+        return notaService.getNota(id);
     }
 
     @PostMapping()
     public NotaResponse crear(@RequestBody NotaRequest request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        return notaService.insertNota(request, authentication.getName());
+        return notaService.insertNota(request);
     }
 
     @PutMapping("/{id}")
     public NotaResponse update(@RequestBody NotaRequest request, @PathVariable("id") Long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        return notaService.updateNota(request, id, authentication.getName());
+        return notaService.updateNota(request, id);
     }
 
     @DeleteMapping("/{id}")
     public BodyBuilder delete(@PathVariable("id") Long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        notaService.deleteNota(id, authentication.getName());
+        notaService.deleteNota(id);
         return ResponseEntity.ok();
     }
 }
