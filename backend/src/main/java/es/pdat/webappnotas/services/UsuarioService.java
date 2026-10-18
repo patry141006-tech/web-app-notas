@@ -1,6 +1,8 @@
 package es.pdat.webappnotas.services;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,11 +12,13 @@ import es.pdat.webappnotas.dto.UsuarioCrearRequest;
 import es.pdat.webappnotas.dto.UsuarioResponse;
 import es.pdat.webappnotas.entity.Usuario;
 import es.pdat.webappnotas.exception.ConflictoException;
+import es.pdat.webappnotas.exception.NoPermisosException;
 import es.pdat.webappnotas.exception.RecursoNoEncontradoException;
 import es.pdat.webappnotas.repository.UsuarioRepository;
+import es.pdat.webappnotas.security.AuthUsuario;
 
 @Service
-public class UsuarioService {
+public class UsuarioService extends AuthUsuario {
 
     private UsuarioRepository usuarioRepository;
     private PasswordEncoder passwordEncoder;
@@ -74,8 +78,19 @@ public class UsuarioService {
                 usuarioEncontrado.get().getContrasena());
     }
 
-    public Optional<Usuario> findByNombreUsuario (String usuario){
+    public Optional<Usuario> findByNombreUsuario(String usuario) {
         return usuarioRepository.findByNombreUsuario(usuario);
-    } 
+    }
 
+    public List<UsuarioResponse> getUsuarios() {
+        if (!isAdmin()) {
+            throw new NoPermisosException("El usuario '" + getUserName() + "' no tiene permisos de administrador");
+        }
+        List<Usuario> usuarios = usuarioRepository.findAll();
+        List<UsuarioResponse> usuarioResponse = new ArrayList<>();
+        for (int i = 0; i < usuarios.size(); i++) {
+            usuarioResponse.add(new UsuarioResponse(usuarios.get(i)));
+        }
+        return usuarioResponse;
+    }
 }

@@ -5,19 +5,25 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import es.pdat.webappnotas.entity.Usuario;
 import es.pdat.webappnotas.exception.RecursoNoEncontradoException;
-import es.pdat.webappnotas.services.UsuarioService;
+import es.pdat.webappnotas.repository.UsuarioRepository;
 
 public class AuthUsuario {
     @Autowired
-    private UsuarioService usuarioService;
+    private UsuarioRepository usuarioRepository;
 
     protected String getUserName() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
     protected Long getIdUsuario() {
-        Usuario usuario = usuarioService.findByNombreUsuario(getUserName())
-                .orElseThrow(() -> new RecursoNoEncontradoException("La nota que buscas no existe"));
+        Usuario usuario = usuarioRepository.findByNombreUsuario(getUserName())
+                .orElseThrow(() -> new RecursoNoEncontradoException("El usuario que buscas no existe"));
         return usuario.getId();
+    }
+
+    protected boolean isAdmin() {
+        Usuario usuario = usuarioRepository.findByNombreUsuario(getUserName())
+                .orElseThrow(() -> new RecursoNoEncontradoException("El usuario que buscas no existe"));
+        return "ADMIN".equals(usuario.getRol());
     }
 }
