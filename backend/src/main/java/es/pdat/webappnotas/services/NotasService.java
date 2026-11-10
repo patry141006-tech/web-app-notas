@@ -11,13 +11,15 @@ import es.pdat.webappnotas.dto.NotaResponse;
 import es.pdat.webappnotas.entity.Nota;
 import es.pdat.webappnotas.exception.RecursoNoEncontradoException;
 import es.pdat.webappnotas.repository.NotaRepository;
+import es.pdat.webappnotas.repository.UsuarioRepository;
 import es.pdat.webappnotas.security.AuthUsuario;
 
 @Service
 public class NotasService extends AuthUsuario {
     private NotaRepository notaRepository;
 
-    public NotasService(NotaRepository notaRepository) {
+    public NotasService(NotaRepository notaRepository, UsuarioRepository usuarioRepository) {
+        super(usuarioRepository);
         this.notaRepository = notaRepository;
     }
 

@@ -24,6 +24,7 @@ public class UsuarioService extends AuthUsuario {
     private PasswordEncoder passwordEncoder;
 
     public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+        super(usuarioRepository);
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
     }

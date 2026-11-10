@@ -4,6 +4,7 @@ import es.pdat.webappnotas.dto.UsuarioCrearRequest;
 import es.pdat.webappnotas.dto.UsuarioResponse;
 import es.pdat.webappnotas.entity.Usuario;
 import es.pdat.webappnotas.exception.ConflictoException;
+import es.pdat.webappnotas.exception.NoPermisosException;
 import es.pdat.webappnotas.exception.RecursoNoEncontradoException;
 import es.pdat.webappnotas.repository.UsuarioRepository;
 import es.pdat.webappnotas.services.UsuarioService;
@@ -12,7 +13,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,8 +42,6 @@ class UsuarioServiceTest {
     private UsuarioService usuarioService;
     @Mock
     private PasswordEncoder passwordEncoder;
-
-    
 
     @Test
     void debeContarUsuarios() {
@@ -134,12 +137,38 @@ class UsuarioServiceTest {
         List<Usuario> listaUsuarios = new ArrayList<>();
         Date date = new Date();
         Usuario usuario = new Usuario(1L, "dani", "dani@dani.com", "12345678", "ADMIN", true, date);
+        listaUsuarios.add(usuario);
         when(usuarioRepository.findAll()).thenReturn(listaUsuarios);
 
-        when(usuarioRepository.findByNombreUsuario("dani")).thenReturn(Optional.of(usuario));
+        when(usuarioRepository.findByNombreUsuario(anyString())).thenReturn(Optional.of(usuario));
+        Authentication authentication = Mockito.mock(Authentication.class);
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+
+        when(authentication.getName()).thenReturn(usuario.getNombreUsuario());
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+
+        SecurityContextHolder.setContext(securityContext);
 
         List<UsuarioResponse> response = usuarioService.getUsuarios();
 
         assertTrue(!response.isEmpty());
+    }
+
+    @Test
+    void testGetUsuariosThrowsException() {
+        Date date = new Date();
+        Usuario usuario = new Usuario(1L, "dani", "dani@dani.com", "12345678", "USER", true, date);
+
+        when(usuarioRepository.findByNombreUsuario(anyString())).thenReturn(Optional.of(usuario));
+        Authentication authentication = Mockito.mock(Authentication.class);
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+
+        when(authentication.getName()).thenReturn(usuario.getNombreUsuario());
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+
+        SecurityContextHolder.setContext(securityContext);
+
+        assertThrows(NoPermisosException.class, () -> usuarioService.getUsuarios(),
+                "No es admin");
     }
 }
