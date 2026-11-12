@@ -151,7 +151,7 @@ class UsuarioServiceTest {
 
         List<UsuarioResponse> response = usuarioService.getUsuarios();
 
-        assertTrue(!response.isEmpty());
+        assertFalse(response.isEmpty());
     }
 
     @Test
